@@ -22,19 +22,37 @@ plant pusher_ss:
         edge c_off goto off;
 end
 
-plant pusher_sensor:
-    uncontrollable u_at_down, u_at_middle, u_at_up;
+plant pusher_at_down_sensor:
+    uncontrollable u_on, u_off;
 
-    location down:
+    location off:
+        edge u_on goto on;
+
+    location on:
         initial; marked;
-        edge u_at_middle goto middle;
+        edge u_off goto off;
+end
 
-    location middle:
-        edge u_at_up goto up;
-        edge u_at_down goto down;
+plant pusher_at_middle_sensor:
+    uncontrollable u_on, u_off;
 
-    location up:
-        edge u_at_middle goto middle;
+    location off:
+        initial; marked;
+        edge u_on goto on;
+
+    location on:
+        edge u_off goto off;
+end
+
+plant pusher_at_up_sensor:
+    uncontrollable u_on, u_off;
+
+    location off:
+        initial; marked;
+        edge u_on goto on;
+
+    location on:
+        edge u_off goto off;
 end
 
 plant holder:
@@ -48,15 +66,26 @@ plant holder:
         edge c_off goto off;
 end
 
-plant holder_sensor:
-    uncontrollable u_closed, u_opened;
+plant holder_closed_sensor:
+    uncontrollable u_on, u_off;
 
-    location closed:
+    location off:
         initial; marked;
-        edge u_opened goto opened;
+        edge u_on goto on;
 
-    location opened:
-        edge u_closed goto closed;
+    location on:
+        edge u_off goto off;
+end
+
+plant holder_opened_sensor:
+    uncontrollable u_on, u_off;
+
+    location off:
+        initial; marked;
+        edge u_on goto on;
+
+    location on:
+        edge u_off goto off;
 end
 
 plant tray_stack:
@@ -82,4 +111,26 @@ plant pusher_tray:
 
     location full:
         edge c_transfered_to_stack goto is_empty;
+end
+
+plant traverse:
+    controllable c_to_fork, c_to_pusher;
+
+    location at_pusher:
+        initial; marked;
+        edge c_to_pusher goto at_fork;
+
+    location at_fork:
+        edge c_to_fork goto at_pusher;
+end
+
+plant at_pusher_sensor:
+    uncontrollable u_on, u_off;
+
+    location off:
+        initial; marked;
+        edge u_on goto on;
+
+    location on:
+        edge u_off goto off;
 end
