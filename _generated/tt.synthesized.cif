@@ -1,0 +1,102 @@
+controllable c_transfered_to_stack;
+controllable c_transfered_to_pusher;
+group pusher_ls:
+  controllable c_on;
+  controllable c_off;
+end
+group pusher_ss:
+  controllable c_on;
+  controllable c_off;
+end
+group pusher_sensor:
+  uncontrollable u_at_down;
+  uncontrollable u_at_middle;
+  uncontrollable u_at_up;
+end
+group holder:
+  controllable c_on;
+  controllable c_off;
+end
+group tray_stack:
+  controllable c_remove;
+end
+group sup:
+  plant automaton pusher_ls:
+    location off:
+      initial;
+      marked;
+      edge .pusher_ls.c_on goto on;
+    location on:
+      edge .pusher_ls.c_off goto off;
+  end
+  plant automaton pusher_ss:
+    location off:
+      initial;
+      marked;
+      edge .pusher_ss.c_on goto on;
+    location on:
+      edge .pusher_ss.c_off goto off;
+  end
+  plant automaton pusher_sensor:
+    location down:
+      initial;
+      marked;
+      edge .pusher_sensor.u_at_middle goto middle;
+    location middle:
+      edge .pusher_sensor.u_at_up goto up;
+      edge .pusher_sensor.u_at_down goto down;
+    location up:
+      edge .pusher_sensor.u_at_middle goto middle;
+  end
+  plant automaton holder:
+    location off:
+      initial;
+      marked;
+      edge .holder.c_on goto on;
+    location on:
+      edge .holder.c_off goto off;
+  end
+  plant automaton tray_stack:
+    const int[2..2] MAX_SIZE = 2;
+    disc int[0..2] count = 0;
+    location is_empty:
+      initial;
+      marked;
+      edge c_transfered_to_stack do count := count + 1 goto none_empty;
+    location none_empty:
+      edge c_transfered_to_stack when count < MAX_SIZE do count := count + 1;
+      edge .tray_stack.c_remove do count := 0 goto is_empty;
+  end
+  plant automaton pusher_tray:
+    location is_empty:
+      initial;
+      marked;
+      edge c_transfered_to_pusher goto full;
+    location full:
+      edge c_transfered_to_stack goto is_empty;
+  end
+  supervisor automaton sup:
+    alphabet .pusher_ls.c_on, .pusher_ls.c_off, .pusher_ss.c_on, .pusher_ss.c_off, .holder.c_on, .holder.c_off, c_transfered_to_stack, .tray_stack.c_remove, c_transfered_to_pusher;
+    location:
+      initial;
+      marked;
+      edge c_transfered_to_pusher when tray_stack.count != 2 or tray_stack.none_empty;
+      edge c_transfered_to_stack when true;
+      edge .holder.c_off when true;
+      edge .holder.c_on when true;
+      edge .pusher_ls.c_off when true;
+      edge .pusher_ls.c_on when true;
+      edge .pusher_ss.c_off when true;
+      edge .pusher_ss.c_on when true;
+      edge .tray_stack.c_remove when true;
+  end
+  supervisor invariant c_transfered_to_pusher needs pusher_sensor.down;
+  supervisor invariant c_transfered_to_stack needs pusher_sensor.up;
+  supervisor invariant c_transfered_to_stack needs pusher_ls.on and pusher_ss.on;
+  supervisor invariant .pusher_ss.c_on needs tray_stack.count < tray_stack.MAX_SIZE;
+  supervisor invariant .pusher_ss.c_on needs holder.on;
+  supervisor invariant .holder.c_on needs pusher_ls.on and pusher_ss.off;
+  supervisor invariant .holder.c_off needs pusher_tray.is_empty;
+  supervisor invariant .pusher_ls.c_off needs holder.off;
+  supervisor invariant .pusher_ss.c_off needs holder.off;
+end

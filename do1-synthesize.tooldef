@@ -1,0 +1,19 @@
+// Synthesize the supervisor.
+
+from "lib:cif" import *;
+
+mkdir("_generated", force=true);
+
+// cifdatasynth("trayTS.plant_and_requirements.cif --forward-reach=true -mdebug -o generated/trayTS.synthesized.cif");
+
+outln("Synthesizing supervisor...");
+
+cifdatasynth(
+    "tt-plant-and-requirements.cif",
+    "-o _generated/tt.synthesized.cif",
+    "-n sup",
+    "-t normal",
+    "-m debug",
+);
+
+outln("Supervisor synthesized.");

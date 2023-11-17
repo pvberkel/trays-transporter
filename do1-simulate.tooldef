@@ -1,0 +1,14 @@
+// Synthesize the supervisor.
+
+from "lib:cif" import *;
+
+// cifdatasynth("trayTS.plant_and_requirements.cif --forward-reach=true -mdebug -o generated/trayTS.synthesized.cif");
+
+outln("Simulate supervisor...");
+
+cifsim("_generated/tt.synthesized.cif",
+    "--stateviz=1",
+//     "--option-dialog=yes",
+);
+
+outln("Supervisor simulated.");

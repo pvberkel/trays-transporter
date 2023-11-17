@@ -1,0 +1,31 @@
+// Plants and requirements as input for supervisory controller synthesis.
+
+import "tt-plant.cif";
+
+// Lamp on only while button is pushed.
+requirement c_transfered_to_pusher needs pusher_sensor.down;
+requirement c_transfered_to_stack needs pusher_sensor.up;
+requirement c_transfered_to_stack needs pusher_ls.on and pusher_ss.on;
+
+//requirement FIFO: pusher_sensor.up => pusher_ss.on;
+
+requirement pusher_ss.c_on needs tray_stack.count < tray_stack.MAX_SIZE;
+requirement pusher_ss.c_on needs holder.on;
+
+requirement holder.c_on needs pusher_ls.on and pusher_ss.off;
+requirement holder.c_off needs pusher_tray.is_empty;
+requirement pusher_ls.c_off needs holder.off;
+requirement pusher_ss.c_off needs holder.off;
+
+
+
+// requirement LampOnWhileButtonPushed:
+//     location Released:
+//         initial; marked;
+//         edge Button.u_pushed goto Pushed;
+//         edge Lamp.c_off;
+//
+//     location Pushed:
+//         edge Button.u_released goto Released;
+//         edge Lamp.c_on;
+// end
