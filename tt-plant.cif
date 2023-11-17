@@ -48,6 +48,17 @@ plant holder:
         edge c_off goto off;
 end
 
+plant holder_sensor:
+    uncontrollable u_closed, u_opened;
+
+    location closed:
+        initial; marked;
+        edge u_opened goto opened;
+
+    location opened:
+        edge u_closed goto closed;
+end
+
 plant tray_stack:
     controllable c_remove;
 
