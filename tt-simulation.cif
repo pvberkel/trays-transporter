@@ -1,0 +1,24 @@
+import "_generated/tt.synthesized.cif";
+
+svgfile "tt.svg";
+
+// svgout id "a_ls_power"        attr "fill"      value if a_ls_power: "green"  else "red" end;
+// svgout id "a_ss_power"        attr "fill"      value if a_ss_power: "green"  else "red" end;
+//
+//svgout id "pusherLongStroke"  attr "transform" value fmt("translate(0,%s)", scale(pusher.position_ls.d, 0, 30, 0, 30));
+// svgout id "pusherShortStroke" attr "transform" value fmt("translate(0,%s)", scale(pusher_ss.y, 0,  5, 0,  5));
+//
+// svgout id "pusher-tray"       attr "transform" value fmt("translate(0,%s)", scale(pusher_tray.y_product, 0, 35, 0, 35));
+// svgout id "pusher-tray"       attr "display"   value if pusher_tray.has_product: "inline" else "none" end;
+//
+// svgout id "input-tray"        attr "display"   value if not entering_tray.hidden: "inline" else "none" end;
+//
+// svgout id "a_feed_tray"       attr "fill"      value if a_feed_tray: "green" else "red" end;
+//
+// svgout id "input-tray"        attr "transform" value fmt("translate(%s,0)", entering_tray.x);
+//
+// svgout id "a_holder_opened"   attr "fill"      value if holders.opened: "green" else "red" end;
+//
+// // svgout id "holder1"           attr "transform" value fmt("rotate(%s,0)", holders.opened);
+// svgout id "holder1"           attr "transform" value if holders.opened: fmt("rotate(%s, 70.59, 60.46)",  20) else fmt("rotate(%s, 70.59, 60.46)", 0) end;
+// svgout id "holder2"           attr "transform" value if holders.opened: fmt("rotate(%s, 123.73, 60.46)", -20) else fmt("rotate(%s, 123.73, 60.46)", 0) end;

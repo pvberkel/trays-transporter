@@ -1,58 +1,81 @@
 controllable c_transfered_to_stack;
 controllable c_transfered_to_pusher;
 
-plant pusher_ls:
-    controllable c_on, c_off;
+group pusher:
+    group position_ls:
+        cont d = 0.0 der if   d >= 0   and pusher_ls.on:  +20
+                         elif d <= 100 and pusher_ls.off: -20
+                         else                               0.0
+                         end;
+    end
 
-    location off:
-        initial; marked;
-        edge c_on goto on;
+    group position_ss:
+        cont d = 0.0 der if   d >= 0   and pusher_ss.on:  +20
+                         elif d <= 100 and pusher_ss.off: -20
+                         else                               0.0
+                         end;
+    end
 
-    location on:
-        edge c_off goto off;
-end
+    plant pusher_ls:
+        controllable c_on, c_off;
 
-plant pusher_ss:
-    controllable c_on, c_off;
-    location off:
-        initial; marked;
-        edge c_on goto on;
+        location off:
+            initial; marked;
+            edge c_on goto on;
 
-    location on:
-        edge c_off goto off;
-end
+        location on:
+            edge c_off goto off;
+    end
 
-plant pusher_at_down_sensor:
-    uncontrollable u_on, u_off;
+    plant pusher_ss:
+        controllable c_on, c_off;
 
-    location off:
-        edge u_on goto on;
+        location off:
+            initial; marked;
+            edge c_on goto on;
 
-    location on:
-        initial; marked;
-        edge u_off goto off;
-end
+        location on:
+            edge c_off goto off;
+    end
 
-plant pusher_at_middle_sensor:
-    uncontrollable u_on, u_off;
+    plant pusher_at_down_sensor:
+        uncontrollable u_on, u_off;
 
-    location off:
-        initial; marked;
-        edge u_on goto on;
+        location off:
+            edge u_on goto on;
+//             edge u_on when position_ls.d <= 0.0 and position_ss.d <= 0.0 goto on;
 
-    location on:
-        edge u_off goto off;
-end
+        location on:
+            initial; marked;
+            edge u_off goto off;
+//             edge u_off when position_ls.d <= 0 and position_ss.d <= 0 goto off;
+    end
 
-plant pusher_at_up_sensor:
-    uncontrollable u_on, u_off;
+    plant pusher_at_middle_sensor:
+        uncontrollable u_on, u_off;
 
-    location off:
-        initial; marked;
-        edge u_on goto on;
+        location off:
+            edge u_on goto on;
+//             edge u_on when position_ls.d >= 100 and position_ss.d <= 0 goto on;
 
-    location on:
-        edge u_off goto off;
+        location on:
+            initial; marked;
+            edge u_off goto off;
+//             edge u_off when position_ls.d < 100 and position_ss.d <= 0 goto off;
+    end
+
+    plant pusher_at_up_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on goto on;
+//             edge u_on when position_ls.d >= 100 and position_ss.d >= 100 goto on;
+
+        location on:
+            initial; marked;
+            edge u_off goto off;
+//             edge u_off when position_ls.d < 100 and position_ss.d < 100 goto off;
+    end
 end
 
 plant holder:
@@ -125,6 +148,17 @@ plant traverse:
 end
 
 plant at_pusher_sensor:
+    uncontrollable u_on, u_off;
+
+    location off:
+        initial; marked;
+        edge u_on goto on;
+
+    location on:
+        edge u_off goto off;
+end
+
+plant at_fork_sensor:
     uncontrollable u_on, u_off;
 
     location off:
