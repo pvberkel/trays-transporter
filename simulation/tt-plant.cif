@@ -1,34 +1,34 @@
 controllable c_transfered_to_stack;
 controllable c_transfered_to_pusher;
 
-automaton controller:
-
-    location S1:
-        initial; marked;
-        edge c_transfered_to_pusher goto S2;
-
-    location S2:
-        edge pusher.pusher_ls.c_on goto S3;
-
-    location S3:
-        edge HG.holder.c_on goto S4;
-
-    location S4:
-        edge pusher.pusher_ss.c_on goto S5;
-
-    location S5:
-        edge c_transfered_to_stack goto S6;
-
-    location S6:
-        edge HG.holder.c_off goto S7;
-
-    location S7:
-        edge pusher.pusher_ss.c_off goto S8;
-
-    location S8:
-        edge pusher.pusher_ls.c_off goto S1;
-
-end
+// automaton controller:
+//
+//     location S1:
+//         initial; marked;
+//         edge c_transfered_to_pusher goto S2;
+//
+//     location S2:
+//         edge pusher.pusher_ls.c_on goto S3;
+//
+//     location S3:
+//         edge HG.holder.c_on goto S4;
+//
+//     location S4:
+//         edge pusher.pusher_ss.c_on goto S5;
+//
+//     location S5:
+//         edge c_transfered_to_stack goto S6;
+//
+//     location S6:
+//         edge HG.holder.c_off goto S7;
+//
+//     location S7:
+//         edge pusher.pusher_ss.c_off goto S8;
+//
+//     location S8:
+//         edge pusher.pusher_ls.c_off goto S1;
+//
+// end
 
 group pusher:
     group position_ls:
@@ -184,6 +184,93 @@ automaton pusher_tray:
         edge c_transfered_to_stack goto is_empty;
 end
 
+group fork:
+    group position:
+        alg real pos = - d;
+        const real at_min = 0;
+        const real at_middle = 61;
+        const real at_max = 81;
+        const real v = 10;
+        cont d = 0   der  if lifter.down_to_middle                              : +v
+                        elif lifter.middle_to_down                              : -v
+                        elif lifter.up_to_middle                                : -v
+                        elif lifter.middle_to_up                                : +v
+                        else                                                       0.0
+                        end;
+    end
+
+    automaton lifter:
+        controllable c_raise1, c_raise2, c_lower1, c_lower2, c_stop1, c_stop2, c_stop3, c_stop4;
+
+        location at_down:
+            initial; marked;
+            edge c_raise1 goto down_to_middle;
+
+        location down_to_middle:
+            edge c_stop1 goto at_middle;
+
+        location middle_to_down:
+            edge c_stop2 goto at_down;
+
+        location at_middle:
+            edge c_raise2 goto middle_to_up;
+            edge c_lower1 goto middle_to_down;
+
+        location middle_to_up:
+            edge c_stop3 goto at_up;
+
+        location up_to_middle:
+            edge c_stop4 goto at_middle;
+
+        location at_up:
+            edge c_lower2 goto up_to_middle;
+    end
+
+
+
+    automaton at_down:
+        uncontrollable u_on, u_off;
+
+        location off:
+//             edge u_on goto on;
+            edge u_on when position.d <= 0 goto on;
+
+        location on:
+            initial; marked;
+//             edge u_off goto off;
+            edge u_off when position.d > 0 goto off;
+    end
+
+    automaton at_middle:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+//             edge u_on goto on;
+            edge u_on when position.d <= position.at_middle + 5 and
+                           position.d >= position.at_middle - 5 goto on;
+
+
+        location on:
+//             edge u_off goto off;
+            edge u_off when not(position.d <= position.at_middle + 5 and
+                                position.d >= position.at_middle - 5) goto off;
+    end
+
+    automaton at_up:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+//             edge u_on goto on;
+            edge u_on when position.d >= position.at_max goto on;
+
+        location on:
+//             edge u_off goto off;
+            edge u_off when position.d < position.at_max goto off;
+    end
+end
+
 // automaton traverse:
 //     controllable c_to_fork, c_to_pusher;
 //
@@ -194,7 +281,7 @@ end
 //     location at_fork:
 //         edge c_to_fork goto at_pusher;
 // end
-//
+
 // automaton at_pusher_sensor:
 //     uncontrollable u_on, u_off;
 //

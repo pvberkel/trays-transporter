@@ -30,6 +30,16 @@ requirement pusher.pusher_ls.c_on needs pusher.pusher_at_down_sensor.on;
 
 requirement pusher.pusher_ls.c_on needs pusher_tray.full;
 
-
 requirement pusher.pusher_ss.c_off needs pusher.pusher_at_up_sensor.on;
 requirement pusher.pusher_ss.c_on needs pusher.pusher_at_middle_sensor.on;
+
+requirement fork.lifter.c_raise1 needs fork.at_down.on;
+requirement fork.lifter.c_raise2 needs fork.at_middle.on;
+requirement fork.lifter.c_lower1 needs fork.at_middle.on;
+requirement fork.lifter.c_lower2 needs fork.at_up.on;
+
+requirement fork.lifter.c_stop1 needs fork.at_middle.on;
+requirement fork.lifter.c_stop2 needs fork.at_down.on;
+requirement fork.lifter.c_stop3 needs fork.at_up.on;
+requirement fork.lifter.c_stop4 needs fork.at_middle.on;
+

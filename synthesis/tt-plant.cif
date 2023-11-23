@@ -118,6 +118,68 @@ plant pusher_tray:
         edge c_transfered_to_stack goto is_empty;
 end
 
+group fork:
+    plant lifter:
+        controllable c_raise1, c_raise2, c_lower1, c_lower2, c_stop1, c_stop2, c_stop3, c_stop4;
+
+        location at_down:
+            initial; marked;
+            edge c_raise1 goto down_to_middle;
+
+        location down_to_middle:
+            edge c_stop1 goto at_middle;
+
+        location middle_to_down:
+            edge c_stop2 goto at_down;
+
+        location at_middle:
+            edge c_raise2 goto middle_to_up;
+            edge c_lower1 goto middle_to_down;
+
+        location middle_to_up:
+            edge c_stop3 goto at_up;
+
+        location up_to_middle:
+            edge c_stop4 goto at_middle;
+
+        location at_up:
+            edge c_lower2 goto up_to_middle;
+    end
+
+    plant at_down:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on goto on;
+
+        location on:
+            initial; marked;
+            edge u_off goto off;
+    end
+
+    plant at_middle:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+
+    plant at_up:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+end
+
 // plant traverse:
 //     controllable c_to_fork, c_to_pusher;
 //
