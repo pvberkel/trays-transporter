@@ -1,0 +1,49 @@
+import "tt-plant.cif";
+
+svgfile "tt.svg";
+
+// Used for actuators that can be clicked in the SVG visualization
+// automaton def Button(alg string name):
+//     uncontrollable u_press;
+//     location off:
+//         initial;
+//         edge u_press goto on;   // toggle button state after each press
+//
+//     location on:
+//          edge u_press goto off; // toggle button state after each press
+//
+//     svgin  id name event u_press;
+// end
+//
+// alg bool a_ls_power        = button_ls_power.on;
+//
+// button_ls_power:           Button("a_ls_power");
+//
+//
+// svgout id "a_ls_power"        attr "fill"      value if a_ls_power: "green"  else "red" end;
+// svgout id "a_ss_power"        attr "fill"      value if a_ss_power: "green"  else "red" end;
+//
+svgout id "pusherLongStroke"  attr "transform" value fmt("translate(0,%s)", scale(pusher.position_ls.pos, 0, 30, 0, 30));
+svgout id "pusherShortStroke" attr "transform" value fmt("translate(0,%s)", scale(pusher.position_ss.pos, 0,  5, 0,  5));
+//
+svgout id "pusher-tray"       attr "transform" value fmt("translate(0,%s)", scale(pusher_tray.position, 0, 35, 0, 35));
+svgout id "pusher-tray"       attr "display"   value if pusher_tray.full: "inline" else "none" end;
+//
+// svgout id "input-tray"        attr "display"   value if not entering_tray.hidden: "inline" else "none" end;
+//
+// svgout id "a_feed_tray"       attr "fill"      value if a_feed_tray: "green" else "red" end;
+//
+// svgout id "input-tray"        attr "transform" value fmt("translate(%s,0)", entering_tray.x);
+//
+// svgout id "a_holder_opened"   attr "fill"      value if HG.holder.on: "green" else "red" end;
+
+svgout id "holderIsOpened"   attr "fill"      value if HG.holder.on: "green" else "red" end;
+svgout id "holderIsClosed"   attr "fill"      value if HG.holder.off: "green" else "red" end;
+
+svgout id "pusherIsDown"     attr "fill"      value if pusher.pusher_at_down_sensor.on: "green" else "red" end;
+svgout id "pusherIsMiddle"   attr "fill"      value if pusher.pusher_at_middle_sensor.on: "green" else "red" end;
+svgout id "pusherIsUp"       attr "fill"      value if pusher.pusher_at_up_sensor.on: "green" else "red" end;
+
+//
+svgout id "holder1"           attr "transform" value if HG.holder.on: fmt("rotate(%s, 70.59, 60.46)",  20) else fmt("rotate(%s, 70.59, 60.46)", 0) end;
+svgout id "holder2"           attr "transform" value if HG.holder.on: fmt("rotate(%s, 123.73, 60.46)", -20) else fmt("rotate(%s, 123.73, 60.46)", 0) end;

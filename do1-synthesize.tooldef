@@ -9,8 +9,8 @@ mkdir("_generated", force=true);
 outln("Synthesizing supervisor...");
 
 cifdatasynth(
-    "tt-plant-and-requirements.cif",
-    "-o _generated/tt.synthesized.cif",
+    "synthesis/tt-plant-and-requirements.cif",
+    "-o _generated/tt.supervisor.cif",
     "-n sup",
     "-t normal",
     "-m debug",

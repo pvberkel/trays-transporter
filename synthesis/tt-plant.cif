@@ -1,0 +1,152 @@
+controllable c_transfered_to_stack;
+controllable c_transfered_to_pusher;
+
+group pusher:
+    plant pusher_ls:
+        controllable c_on, c_off;
+
+        location off:
+            initial; marked;
+            edge c_on goto on;
+
+        location on:
+            edge c_off goto off;
+    end
+
+    plant pusher_ss:
+        controllable c_on, c_off;
+
+        location off:
+            initial; marked;
+            edge c_on goto on;
+
+        location on:
+            edge c_off goto off;
+    end
+
+    plant pusher_at_down_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on goto on;
+
+        location on:
+            initial; marked;
+            edge u_off goto off;
+    end
+
+    plant pusher_at_middle_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+
+    plant pusher_at_up_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+end
+
+group HG:
+    plant holder:
+        controllable c_on, c_off;
+
+        location off:
+            initial; marked;
+            edge c_on goto on;
+
+        location on:
+            edge c_off goto off;
+    end
+
+    plant holder_closed_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on goto on;
+
+        location on:
+            initial; marked;
+            edge u_off goto off;
+    end
+
+    plant holder_opened_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+end
+
+plant tray_stack:
+    controllable c_remove;
+
+    const int MAX_SIZE = 2;
+
+    disc int[0..MAX_SIZE] count = 0;
+
+    location is_empty:
+        initial; marked;
+        edge c_transfered_to_stack do count := count + 1 goto none_empty;
+
+    location none_empty:
+        edge c_transfered_to_stack when count < MAX_SIZE do count := count + 1;
+        edge c_remove do count := 0 goto is_empty;
+end
+
+plant pusher_tray:
+    location is_empty:
+        initial; marked;
+        edge c_transfered_to_pusher goto full;
+
+    location full:
+        edge c_transfered_to_stack goto is_empty;
+end
+
+// plant traverse:
+//     controllable c_to_fork, c_to_pusher;
+//
+//     location at_pusher:
+//         initial; marked;
+//         edge c_to_pusher goto at_fork;
+//
+//     location at_fork:
+//         edge c_to_fork goto at_pusher;
+// end
+//
+// plant at_pusher_sensor:
+//     uncontrollable u_on, u_off;
+//
+//     location off:
+//         initial; marked;
+//         edge u_on goto on;
+//
+//     location on:
+//         edge u_off goto off;
+// end
+//
+// plant at_fork_sensor:
+//     uncontrollable u_on, u_off;
+//
+//     location off:
+//         initial; marked;
+//         edge u_on goto on;
+//
+//     location on:
+//         edge u_off goto off;
+// end

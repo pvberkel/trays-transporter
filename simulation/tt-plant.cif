@@ -1,0 +1,218 @@
+controllable c_transfered_to_stack;
+controllable c_transfered_to_pusher;
+
+automaton controller:
+
+    location S1:
+        initial; marked;
+        edge c_transfered_to_pusher goto S2;
+
+    location S2:
+        edge pusher.pusher_ls.c_on goto S3;
+
+    location S3:
+        edge HG.holder.c_on goto S4;
+
+    location S4:
+        edge pusher.pusher_ss.c_on goto S5;
+
+    location S5:
+        edge c_transfered_to_stack goto S6;
+
+    location S6:
+        edge HG.holder.c_off goto S7;
+
+    location S7:
+        edge pusher.pusher_ss.c_off goto S8;
+
+    location S8:
+        edge pusher.pusher_ls.c_off goto S1;
+
+end
+
+group pusher:
+    group position_ls:
+        alg real pos = - d;
+        const real at_min = 0;
+        const real at_max = 15;
+        cont d = 0.0 der  if d <= at_max and pusher_ls.on:  +5
+                        elif d >= 0      and pusher_ls.off: -5
+                        else                               0.0
+                        end;
+    end
+
+    group position_ss:
+        const real at_min = 0;
+        const real at_max = 3.5;
+        alg real pos = - d;
+        cont d = 0.0 der  if d <= at_max and pusher_ss.on:  +2
+                        elif d >= 0      and pusher_ss.off: -2
+                        else                               0.0
+                        end;
+    end
+
+    automaton pusher_ls:
+        controllable c_on, c_off;
+
+        location off:
+            initial; marked;
+            edge c_on goto on;
+
+        location on:
+            edge c_off goto off;
+    end
+
+    automaton pusher_ss:
+        controllable c_on, c_off;
+
+        location off:
+            initial; marked;
+            edge c_on goto on;
+
+        location on:
+            edge c_off goto off;
+    end
+
+    automaton pusher_at_down_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+//             edge u_on goto on;
+            edge u_on when position_ls.d + position_ss.d  <= 0 goto on;
+
+        location on:
+            initial; marked;
+//             edge u_off goto off;
+            edge u_off when position_ls.d + position_ss.d  > 0 goto off;
+    end
+
+    automaton pusher_at_middle_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+//             edge u_on goto on;
+            edge u_on when position_ls.d + position_ss.d  <= position_ls.at_max + 1 and
+                           position_ls.d + position_ss.d  >= position_ls.at_max - 1 goto on;
+
+        location on:
+//             edge u_off goto off;
+            edge u_off when not (position_ls.d + position_ss.d  <= position_ls.at_max + 1 and
+                                 position_ls.d + position_ss.d  >= position_ls.at_max - 1) goto off;
+    end
+
+    automaton pusher_at_up_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+//             edge u_on goto on;
+            edge u_on when position_ls.d + position_ss.d  >= position_ls.at_max + position_ss.at_max goto on;
+
+        location on:
+//             edge u_off goto off;
+            edge u_off when position_ls.d + position_ss.d  < position_ls.at_max + position_ss.at_max goto off;
+    end
+end
+
+group HG:
+    automaton holder:
+        controllable c_on, c_off;
+
+        location off:
+            initial; marked;
+            edge c_on goto on;
+
+        location on:
+            edge c_off goto off;
+    end
+
+    automaton holder_closed_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on when holder.off goto on;
+
+        location on:
+            initial; marked;
+            edge u_off when holder.on goto off;
+    end
+
+    automaton holder_opened_sensor:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on when holder.on goto on;
+
+        location on:
+            edge u_off when holder.off goto off;
+    end
+end
+
+automaton tray_stack:
+    controllable c_remove;
+
+    const int MAX_SIZE = 2;
+
+    disc int[0..MAX_SIZE] count = 0;
+
+    location is_empty:
+        initial; marked;
+        edge c_transfered_to_stack do count := count + 1 goto none_empty;
+
+    location none_empty:
+        edge c_transfered_to_stack when count = MAX_SIZE - 1 do count := count + 1 goto full;
+        edge c_transfered_to_stack when count < MAX_SIZE - 1 do count := count + 1;
+
+    location full:
+        edge c_remove do count := 0 goto is_empty;
+end
+
+automaton pusher_tray:
+    const real tray_pusher_offset = -3.5;
+    alg real pusher_sum_pos = pusher.position_ls.pos + pusher.position_ss.pos;
+    alg real position = if pusher_sum_pos < tray_pusher_offset: pusher_sum_pos - tray_pusher_offset
+                        else                                    0
+                        end;
+
+    location is_empty:
+        initial; marked;
+        edge c_transfered_to_pusher  goto full;
+
+    location full:
+        edge c_transfered_to_stack goto is_empty;
+end
+
+// automaton traverse:
+//     controllable c_to_fork, c_to_pusher;
+//
+//     location at_pusher:
+//         initial; marked;
+//         edge c_to_pusher goto at_fork;
+//
+//     location at_fork:
+//         edge c_to_fork goto at_pusher;
+// end
+//
+// automaton at_pusher_sensor:
+//     uncontrollable u_on, u_off;
+//
+//     location off:
+//         initial; marked;
+//         edge u_on goto on;
+//
+//     location on:
+//         edge u_off goto off;
+// end
+//
+// automaton at_fork_sensor:
+//     uncontrollable u_on, u_off;
+//
+//     location off:
+//         initial; marked;
+//         edge u_on goto on;
+//
+//     location on:
+//         edge u_off goto off;
+// end
