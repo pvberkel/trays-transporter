@@ -27,7 +27,6 @@ controllable c_transfered_to_pusher;
 //
 //     location S8:
 //         edge pusher.pusher_ls.c_off goto S1;
-//
 // end
 
 group pusher:
@@ -188,7 +187,7 @@ group fork:
     group position:
         alg real pos = - d;
         const real at_min = 0;
-        const real at_middle = 61;
+        const real at_middle = 67;
         const real at_max = 81;
         const real v = 10;
         cont d = 0   der  if lifter.down_to_middle                              : +v
@@ -225,8 +224,6 @@ group fork:
         location at_up:
             edge c_lower2 goto up_to_middle;
     end
-
-
 
     automaton at_down:
         uncontrollable u_on, u_off;
@@ -268,6 +265,92 @@ group fork:
         location on:
 //             edge u_off goto off;
             edge u_off when position.d < position.at_max goto off;
+    end
+end
+
+group traverse:
+    // Position.
+    group position:
+        cont t = 0.0 der if   actuator.to_pusher and t >  0.0:  -10.0
+                         elif actuator.to_fork   and t <  60.0: +10.0
+                         else                                       0.0
+                         end;
+    end
+
+    automaton actuator:
+        controllable c_to_pusher, c_to_fork;
+
+        location to_pusher:
+            edge c_to_fork goto to_fork;
+
+        location to_fork:
+            initial; marked;
+            edge c_to_pusher goto to_pusher;
+    end
+
+    automaton at_pusher:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on when position.t <= 0 goto on;
+
+        location on:
+            initial; marked;
+            edge u_off when position.t > 0 goto off;
+    end
+
+    automaton at_fork:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on when position.t >= 60 goto on;
+
+        location on:
+            edge u_off when position.t < 60 goto off;
+    end
+end
+
+group turner:
+    // Position.
+    group position:
+        cont t = 0.0 der if   actuator.to_traverse and t >  0.0:  -1.0
+                         elif actuator.to_furnace  and t <  10.0: +1.0
+                         else                                      0.0
+                         end;
+    end
+
+    automaton actuator:
+        controllable c_to_traverse, c_to_furnace;
+
+        location to_traverse:
+            edge c_to_furnace goto to_furnace;
+
+        location to_furnace:
+            initial; marked;
+            edge c_to_traverse goto to_traverse;
+    end
+
+    automaton at_traverse:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on when position.t <= 0 goto on;
+
+        location on:
+            initial; marked;
+            edge u_off when position.t > 0 goto off;
+    end
+
+    automaton at_furnace:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on when position.t >= 10 goto on;
+
+        location on:
+            edge u_off when position.t < 10 goto off;
     end
 end
 

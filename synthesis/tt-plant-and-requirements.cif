@@ -9,8 +9,6 @@ requirement c_transfered_to_pusher needs pusher.pusher_ls.off and pusher.pusher_
 requirement c_transfered_to_stack needs pusher.pusher_at_up_sensor.on;
 requirement c_transfered_to_stack needs pusher.pusher_ls.on and pusher.pusher_ss.on;
 
-//requirement FIFO: pusher_sensor.up => pusher_ss.on;
-
 requirement pusher.pusher_ss.c_on needs pusher.pusher_ls.on;
 requirement pusher.pusher_ss.c_on needs tray_stack.count < tray_stack.MAX_SIZE;
 requirement pusher.pusher_ss.c_on needs HG.holder.on and HG.holder_opened_sensor.on; // and holder_closed_sensor.off;
@@ -42,4 +40,39 @@ requirement fork.lifter.c_stop1 needs fork.at_middle.on;
 requirement fork.lifter.c_stop2 needs fork.at_down.on;
 requirement fork.lifter.c_stop3 needs fork.at_up.on;
 requirement fork.lifter.c_stop4 needs fork.at_middle.on;
+
+requirement turner.actuator.c_to_traverse needs turner.at_furnace.on;
+requirement turner.actuator.c_to_furnace needs turner.at_traverse.on;
+
+requirement traverse.actuator.c_to_fork needs traverse.at_pusher.on;
+requirement traverse.actuator.c_to_pusher needs traverse.at_fork.on;
+
+// fork traverse conflict prevention
+requirement fork.lifter.c_raise2 needs traverse.at_fork.on;
+requirement fork.lifter.c_lower2 needs traverse.at_fork.on;
+requirement fork.lifter.c_stop3 needs traverse.at_fork.on;
+requirement fork.lifter.c_stop4 needs traverse.at_fork.on;
+
+// pusher traverse conflict prevention
+requirement pusher.pusher_ss.c_off needs traverse.at_pusher.on;
+requirement pusher.pusher_ss.c_on needs traverse.at_pusher.on;
+
+requirement HG.holder.c_on needs traverse.at_pusher.on;
+requirement HG.holder.c_off needs traverse.at_pusher.on;
+
+requirement traverse.actuator.c_to_fork needs HG.holder.off;
+requirement traverse.actuator.c_to_fork needs pusher.pusher_at_middle_sensor.off;
+
+requirement traverse.actuator.c_to_fork needs tray_stack.count >= 2;
+requirement HG.holder.c_on needs tray_stack.count < 2;
+
+requirement tray_stack.c_remove needs traverse.at_fork.on and fork.lifter.at_middle;
+
+requirement traverse.actuator.c_to_pusher needs tray_stack.count = 0;
+requirement pusher.pusher_ls.c_off needs pusher_tray.is_empty;
+
+// //requirement traverse.actuator.c_to_fork needs fork.lifter.at_middle or fork.lifter.at_down;
+// requirement traverse.actuator.c_to_fork needs not fork.lifter.middle_to_up and not fork.lifter.up_to_middle and fork.lifter.at_up;
+
+
 

@@ -48,9 +48,16 @@ svgout id "pusherIsUp"       attr "fill"      value if pusher.pusher_at_up_senso
 svgout id "holder1"           attr "transform" value if HG.holder.on: fmt("rotate(%s, 70.59, 60.46)",  20) else fmt("rotate(%s, 70.59, 60.46)", 0) end;
 svgout id "holder2"           attr "transform" value if HG.holder.on: fmt("rotate(%s, 123.73, 60.46)", -20) else fmt("rotate(%s, 123.73, 60.46)", 0) end;
 
-
 svgout id "forkLifterIsDown"   attr "fill"      value if fork.at_down.on: "green" else "red" end;
 svgout id "forkLifterIsMiddle" attr "fill"      value if fork.at_middle.on: "green" else "red" end;
 svgout id "forkLifterIsUp"     attr "fill"      value if fork.at_up.on: "green" else "red" end;
 
-svgout id "fork"  attr "transform" value fmt("translate(0,%s)", scale(fork.position.pos, 0, 60, 0, 60));
+svgout id "fork"              attr "transform" value fmt("translate(0,%s)", scale(fork.position.pos, 0, 60, 0, 60));
+// svgout id "fork"              attr "transform" value fmt("translate(470,%s), scale(-1, 1)", scale(fork.position.pos, 0, 60, 0, 60));
+
+//svgout id "rect10"              attr "width" value scale(turner.position.t, -10, 10, 0, 50);
+
+svgout id "truckIsTurnedToFurnace"    attr "fill"      value if turner.at_furnace.on: "green" else "red" end;
+svgout id "truckIsTurnedToTraverse"   attr "fill"      value if turner.at_traverse.on: "green" else "red" end;
+
+svgout id "traverse"              attr "transform" value fmt("translate(%s,0)", scale(traverse.position.t, 0, 60, 0, 60));

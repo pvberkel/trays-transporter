@@ -13,6 +13,7 @@ group pusher:
             edge c_off goto off;
     end
 
+
     plant pusher_ss:
         controllable c_on, c_off;
 
@@ -169,6 +170,76 @@ group fork:
     end
 
     plant at_up:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+end
+
+group traverse:
+    plant actuator:
+        controllable c_to_pusher, c_to_fork;
+
+        location to_pusher:
+            edge c_to_fork goto to_fork;
+
+        location to_fork:
+            initial; marked;
+            edge c_to_pusher goto to_pusher;
+    end
+
+    plant at_pusher:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on goto on;
+
+        location on:
+            initial; marked;
+            edge u_off goto off;
+    end
+
+    plant at_fork:
+        uncontrollable u_on, u_off;
+
+        location off:
+            initial; marked;
+            edge u_on goto on;
+
+        location on:
+            edge u_off goto off;
+    end
+end
+
+group turner:
+    plant actuator:
+        controllable c_to_traverse, c_to_furnace;
+
+        location to_traverse:
+            edge c_to_furnace goto to_furnace;
+
+        location to_furnace:
+            initial; marked;
+            edge c_to_traverse goto to_traverse;
+    end
+
+    plant at_traverse:
+        uncontrollable u_on, u_off;
+
+        location off:
+            edge u_on goto on;
+
+        location on:
+            initial; marked;
+            edge u_off goto off;
+    end
+
+    plant at_furnace:
         uncontrollable u_on, u_off;
 
         location off:
